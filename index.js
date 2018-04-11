@@ -1,9 +1,7 @@
 const client = require('cheerio-httpcli')
-const dotenv = require('dotenv')
 const tough = require('tough-cookie')
-const rp = require('request-promise')
+const request = require('request-promise')
 
-dotenv.config()
 const email = process.env.EMAIL
 const password = process.env.PASSWORD
 const webhook = process.env.SLACK_WEBHOOK
@@ -16,13 +14,13 @@ const fetchCheckedCount = async userToken => {
     path: '/',
     domain: 'techbookfest.org'
   })
-  const jar = rp.jar()
+  const jar = request.jar()
   jar.setCookie(cookie, 'https://techbookfest.org')
   const opt = {
     url: 'https://techbookfest.org/api/circle/own',
     jar
   }
-  const circles = JSON.parse(await rp(opt))
+  const circles = JSON.parse(await request(opt))
   const checkedCount = circles.filter(circle => circle.event.id === 'tbf04').map(circle => circle.checkedCount)[0]
   return checkedCount
 }
@@ -39,7 +37,7 @@ const signIn = async () => {
     },
     resolveWithFullResponse: true
   }
-  const res = await rp(opt)
+  const res = await request(opt)
   const matched = re.exec(res.headers['set-cookie'][0])
   return matched[1]
 }
@@ -59,7 +57,7 @@ const sendToSlack = async message => {
       text: message
     }
   }
-  await rp(opt)
+  await request(opt)
 }
 
 const sendCheckedcountToSlack = async () => {
@@ -73,12 +71,11 @@ const sleep = count =>
     setTimeout(() => resolve(), count)
   })
 
-const bot = async hourly => {
-  for (;;) {
-    const checkedCount = await sendCheckedcountToSlack()
-    console.log(new Date().toLocaleString(), checkedCount)
-    await sleep(1000 * 60 * 60 * hourly)
-  }
+exports.handler = () => {
+  (async () => {
+    try {
+      const checkedCount = await sendCheckedcountToSlack()
+      console.log(new Date().toLocaleString(), checkedCount)
+    } catch {}
+  })
 }
-
-bot(6).catch(err => console.log(err))
