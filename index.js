@@ -73,11 +73,16 @@ const sleep = count =>
     setTimeout(() => resolve(), count)
   })
 
-exports.handler = async () => {
-  try {
-    const checkedCount = await sendCheckedcountToSlack()
-    console.log(new Date().toLocaleString(), checkedCount)
-  } catch (e) {
-    console.error(e)
-  }
+exports.handler = () => {
+  return new Promise(()=>{
+    sendCheckedcountToSlack()
+    .then(()=>{
+      console.log(new Date().toLocaleString(), checkedCount)
+      return Promise.resolve()
+    })
+    .catch(()=>{
+      console.error(e)
+      return Promise.resolve()
+    })
+  })
 }
