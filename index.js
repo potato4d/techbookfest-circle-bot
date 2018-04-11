@@ -6,6 +6,7 @@ const email = process.env.EMAIL
 const password = process.env.PASSWORD
 const webhook = process.env.SLACK_WEBHOOK
 const channel = process.env.SLACK_CHANNEL
+const mention = process.env.SLACK_MENTION
 
 const fetchCheckedCount = async userToken => {
   const cookie = new tough.Cookie({
@@ -62,7 +63,8 @@ const sendToSlack = async message => {
 
 const sendCheckedcountToSlack = async () => {
   const checkedCount = await crawl()
-  await sendToSlack(`被サークルチェック数: ${checkedCount}`)
+  await sendToSlack(`<@${mention}>
+技術書典04 ${new Date().toLocaleString()}における被サークルチェック数: ${checkedCount}`)
   return checkedCount
 }
 
@@ -71,11 +73,11 @@ const sleep = count =>
     setTimeout(() => resolve(), count)
   })
 
-exports.handler = () => {
-  (async () => {
+exports.handler = async () => {
     try {
       const checkedCount = await sendCheckedcountToSlack()
       console.log(new Date().toLocaleString(), checkedCount)
-    } catch {}
-  })
+    } catch (e) {
+      console.error(e)
+    }
 }
