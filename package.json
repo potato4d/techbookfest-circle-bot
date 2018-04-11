@@ -7,5 +7,8 @@
     "cheerio-httpcli": "^0.7.2",
     "request-promise": "^4.2.2",
     "tough-cookie": "^2.3.4"
+  },
+  "devDependencies": {
+    "prettier": "^1.11.1"
   }
 }

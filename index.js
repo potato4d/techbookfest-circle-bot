@@ -74,10 +74,10 @@ const sleep = count =>
   })
 
 exports.handler = async () => {
-    try {
-      const checkedCount = await sendCheckedcountToSlack()
-      console.log(new Date().toLocaleString(), checkedCount)
-    } catch (e) {
-      console.error(e)
-    }
+  try {
+    const checkedCount = await sendCheckedcountToSlack()
+    console.log(new Date().toLocaleString(), checkedCount)
+  } catch (e) {
+    console.error(e)
+  }
 }
